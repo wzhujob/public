@@ -1,0 +1,14 @@
+--- 
+
+- name: Cisco show version example
+  hosts: test
+  gather_facts: false
+
+  tasks:
+    - name: run show version on the routers
+      ios_command:
+        commands: show mac address-table
+      register: output
+    - name: print output
+      debug:
+        var: output.stdout_lines

@@ -1,0 +1,39 @@
+---
+
+- name: Cisco Reload Switch
+  hosts: test
+  gather_facts: false
+
+  tasks:
+    - name: Print init header
+      ansible.builtin.debug:
+        msg: Saving running-config and reloading switch/router
+    - name: Save running-config and reload the switch/router
+      ios_command:
+        commands:
+          - command: write memory
+            prompt: file
+            answer: 'Y'
+          - command: reload
+            prompt:
+              - 'continue'
+            #  - 'reset the whole system'
+            answer:
+              - 'Y'
+            #  - "\r"
+      register: result
+      ignore_errors: yes
+    - name: show result
+      debug:
+        var: result.stdout_lines
+    - name: reset the connection
+      meta: reset_connection
+    - name: wait for the network device to reload
+      ansible.builtin.wait_for:
+        delay: 60
+        host: "1.2.3.4"
+        port: 22
+        sleep: 5
+    - name: Print footer
+      ansible.builtin.debug:
+        msg: finished reloading
